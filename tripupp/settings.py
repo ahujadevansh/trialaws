@@ -17,7 +17,7 @@ import json
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-with open(os.path.join(BASE_DIR, r'etc\\config.json')) as config_file:
+with open(r'/home/ubuntu/Sep19/etc/config.json') as config_file:
     config = json.load(config_file)
 
 # Quick-start development settings - unsuitable for production
@@ -27,9 +27,26 @@ with open(os.path.join(BASE_DIR, r'etc\\config.json')) as config_file:
 SECRET_KEY = config.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG =  False
 
-ALLOWED_HOSTS = []
+
+# https://docs.djangoproject.com/en/2.2/topics/security/
+# https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
+
+# Using a secure-only CSRF cookie makes it more difficult for network traffic sniffers
+# to steal the CSRF token.
+CSRF_COOKIE_SECURE = True
+
+
+# Using a secure-only session cookie makes it more difficult for network traffic sniffers
+# to hijack user sessions.
+# SECURITY WARNING: don't run with SESSION_COOKIE_SECURE,SECURE_SSL_REDIRECT turned off in production!
+SESSION_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = True    # https://docs.djangoproject.com/en/2.2/topics/security/#ssl-https
+
+# SESSION_COOKIE_AGE = 129600 # 36 hours
+
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -41,12 +58,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # third party apps
+    'storages',
 
     # Local Apps
     'users.apps.UsersConfig',
     'home.apps.HomeConfig',
     'cities.apps.CitiesConfig',
-    'categories.apps.CategoriesConfig'
+    'categories.apps.CategoriesConfig',
 ]
 
 MIDDLEWARE = [
@@ -86,11 +105,11 @@ WSGI_APPLICATION = 'tripupp.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'tripupp',
-        'HOST': 'localhost',
+        'NAME': config.get('DATABASE_NAME'),
+        'HOST': config.get('DATABASE_HOST'),
         'USER': config.get('DATABASE_USER'),
         'PASSWORD': config.get('DATABASE_PASSWORD'),
-        'PORT': 3360,
+        'PORT': config.get('DATABASE_PORT'),
     }
 }
 
@@ -139,3 +158,11 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static_cdn")
 MEDIA_ROOT = os.path.join(BASE_DIR, "media_cdn")
 
 AUTH_USER_MODEL = 'users.CustomUser'
+AWS_ACCESS_KEY_ID = config.get('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = config.get('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = config.get('AWS_STORAGE_BUCKET_NAME')
+
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL = None
+
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
