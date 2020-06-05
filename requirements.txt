@@ -2,7 +2,7 @@ astroid==2.2.5
 boto3==1.9.226
 botocore==1.12.226
 colorama==0.4.1
-Django==2.2.4
+Django==2.2.13
 django-storages==1.7.2
 docutils==0.15.2
 entrypoints==0.3
